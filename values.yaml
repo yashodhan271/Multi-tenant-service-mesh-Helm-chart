@@ -1,0 +1,54 @@
+# Global configurations
+global:
+  istioNamespace: istio-system
+  meshID: mesh1
+
+# Tenant configurations
+tenants:
+  - name: tenant1
+    namespace: tenant1
+    labels:
+      tenant: tenant1
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    networkPolicies:
+      enabled: true
+    istio:
+      mtls:
+        mode: STRICT
+      authorization:
+        enabled: true
+    ingressGateway:
+      enabled: true
+      hosts:
+        - "*.tenant1.example.com"
+
+# Default RBAC settings
+rbac:
+  create: true
+  clusterRole: true
+
+# Service mesh configurations
+serviceMesh:
+  enabled: true
+  provider: istio  # can be istio or linkerd
+  mtls:
+    enabled: true
+  monitoring:
+    enabled: true
+  tracing:
+    enabled: true
+
+# Resource quotas
+resourceQuotas:
+  enabled: true
+  default:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi

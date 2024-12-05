@@ -1,0 +1,25 @@
+{{- range .Values.tenants }}
+{{- if .istio.authorization.enabled }}
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: tenant-auth-policy
+  namespace: {{ .name }}
+spec:
+  selector:
+    matchLabels:
+      tenant: {{ .name }}
+  rules:
+  - from:
+    - source:
+        namespaces: ["{{ .name }}"]
+        principals: ["cluster.local/ns/{{ .name }}/sa/*"]
+    to:
+    - operation:
+        methods: ["*"]
+  - from:
+    - source:
+        namespaces: ["istio-system"]
+{{- end }}
+{{- end }}

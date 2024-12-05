@@ -1,0 +1,41 @@
+{{- range .Values.tenants }}
+{{- if .ingressGateway.enabled }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .name }}-vs
+  namespace: {{ .name }}
+spec:
+  hosts:
+  {{- range .ingressGateway.hosts }}
+    - {{ . | quote }}
+  {{- end }}
+  gateways:
+    - {{ .name }}-gateway
+  http:
+    - route:
+        - destination:
+            host: {{ .name }}-service
+            port:
+              number: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ .name }}-gateway
+  namespace: {{ .name }}
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+      {{- range .ingressGateway.hosts }}
+        - {{ . | quote }}
+      {{- end }}
+{{- end }}
+{{- end }}
